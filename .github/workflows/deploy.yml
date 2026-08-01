@@ -34,3 +34,4 @@ jobs:
         cd ./the-gateway-to-vue
         npm install
         npm run build
+        npm run deploy
