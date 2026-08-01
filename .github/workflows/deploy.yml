@@ -21,11 +21,14 @@ jobs:
     name: Determine target deployment
     runs-on: ubuntu-latest
     
-  steps:
-    - uses: actions/checkout@v6
+    steps:
+    - name: checkout
+      uses: actions/checkout@v6
     
-    - name: node action
+    - name: setup node
       uses: actions/setup-node@v6
+
+    - name: run build
       run: |
         ls -la
         cd ./the-gateway-to-vue
