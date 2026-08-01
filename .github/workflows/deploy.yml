@@ -22,11 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     
   steps:
-    - uses: actions/checkout@v6
-    
-    - name: node action
-      uses: actions/setup-node@v6
-      run: |
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+        package-manager-cache: false # Disable automatic npm caching if not required
+    - run: |
         cd ./the-gateway-to-vue
         npm install
         npm run build
