@@ -1,0 +1,40 @@
+name: Deploy
+run-name: "Deploying from \"${{ github.head_ref || github.ref_name }}\""
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_deployment:
+        type: choice
+        description: ""
+        required: true
+        default: 'beta'
+        options:
+          - beta
+      dry_run:
+        description: "Workflow dry run"
+        type: boolean
+        default: false
+
+jobs:
+  target-deployment:
+    name: Determine target deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: checkout
+      uses: actions/checkout@v6
+    
+    - name: setup node
+      uses: actions/setup-node@v6
+
+    - name: run build
+      run: |
+        ls -la
+        cd ./the-gateway-to-vue
+        npm install
+        npm run build
+        git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
