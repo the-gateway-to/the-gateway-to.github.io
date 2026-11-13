@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { watch, ref} from 'vue';
 import { ModalContext } from './modal-context';
-import type { idText } from 'typescript';
 
 type SizeType = 'small' | 'medium' | 'large' | 'extra-large';
 
@@ -42,7 +41,7 @@ if (context.display) {
     ModalContext.set(context.id);
 }
 
-watch(() => context.display, (oldVal, newVal) => {
+watch(() => context.display, (_, newVal) => {
     if (newVal) {
         ModalContext.set(context.id);
     } else {
@@ -51,19 +50,19 @@ watch(() => context.display, (oldVal, newVal) => {
     }
 });
 
-watch(() => ModalContext, (oldVal, newVal) => {
+watch(() => ModalContext, (_, newVal) => {
     console.log({ modalContextUpdate: new Date(), id: newVal.id, ref: newVal.ref });
     selected.value = newVal.id || '';
 }, { deep: true });
 
-function modalSize(): string {
-    return {
-        'small': 'modal-sm',
-        'medium': 'modal-md',
-        'large': 'modal-lg',
-        'extra-large': 'modal-xl'
-    }[context.size || 'medium'] || 'modal-lg';
-}
+// function modalSize(): string {
+//     return {
+//         'small': 'modal-sm',
+//         'medium': 'modal-md',
+//         'large': 'modal-lg',
+//         'extra-large': 'modal-xl'
+//     }[context.size || 'medium'] || 'modal-lg';
+// }
 
 </script>
 
