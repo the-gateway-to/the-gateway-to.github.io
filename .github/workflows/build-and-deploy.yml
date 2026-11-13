@@ -1,0 +1,74 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build without deploying to gh-pages
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Run build
+        shell: bash
+        run: |
+          ls -la
+          cd ./the-gateway-to-vue
+          npm install
+          npm run build
+          cp dist/index.html dist/404.html
+
+      - name: Deploy
+        if: ${{ !inputs.dry_run }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          dist="$GITHUB_WORKSPACE/the-gateway-to-vue/dist"
+          if [[ ! -d "$dist" ]]; then
+            echo "::error::Build output directory does not exist: $dist"
+            exit 1
+          fi
+          if [[ -z "$(find "$dist" -mindepth 1 -print -quit)" ]]; then
+            echo "::error::Build output directory is empty: $dist"
+            exit 1
+          fi
+
+          deploy_dir="$(mktemp -d "$RUNNER_TEMP/gh-pages.XXXXXX")"
+          trap 'rm -rf -- "$deploy_dir"' EXIT
+          cp -a "$dist/." "$deploy_dir/"
+          cd "$deploy_dir"
+
+          git init --initial-branch=gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --force --all
+          git commit -m "Deploy build from $GITHUB_SHA"
+          git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          echo "::add-mask::$auth"
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" push --force origin HEAD:refs/heads/gh-pages
