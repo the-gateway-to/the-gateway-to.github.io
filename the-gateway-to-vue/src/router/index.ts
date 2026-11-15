@@ -7,7 +7,7 @@ const routes = [
     path: "/christmas",
     name: "AdventCalendar",
     component: AdventCalendar,
-    props: (route) => ({ date: route.params.date || null }),
+    props: (route: any) => ({ date: route.params.date || null }),
   },
   {
     path: "/test001",
