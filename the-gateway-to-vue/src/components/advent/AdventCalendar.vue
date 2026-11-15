@@ -16,8 +16,13 @@ export interface Context {
     enteredPasscode?: string,
 }
 
+export interface Props {
+    date?: string;
+}
+
 const route = useRoute();
-const routeDate = Utils.getFirst(route.params.date);
+const routeDate = Utils.getFirst(route.query.date);
+
 
 const unlocked = useStorage('unlocked', 0);
 
@@ -74,7 +79,7 @@ function reset() {
             <div class="col-10">
 
                 <h1 class="vh-row-1 font-cute-snow text-center">
-                    {{ config.title }}
+                    {{ config.title }} {{ routeDate }}
                 </h1>
                 <div class="vh-row-6" style="height: 100%;">
 

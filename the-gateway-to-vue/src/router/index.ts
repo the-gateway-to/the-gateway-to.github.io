@@ -4,9 +4,10 @@ import AdventCalendar from "../components/advent/AdventCalendar.vue";
 
 const routes = [
   {
-    path: "/christmas/:date?",
+    path: "/christmas",
     name: "AdventCalendar",
     component: AdventCalendar,
+    props: (route) => ({ date: route.params.date || null }),
   },
   {
     path: "/test001",
