@@ -198,9 +198,7 @@ function reset() {
       display: grid;
       grid-template-columns: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin;
       grid-template-rows: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin;
-      #grid-gap: 10px;
       background-color: #2196f3;
-      #padding: 10px;
     }
 
     .grid-container > div {
