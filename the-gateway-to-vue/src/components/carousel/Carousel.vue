@@ -44,7 +44,8 @@ function scroll(step: number) {
                 <span class="bi bi-arrow-left-circle p-2 fs-1 text-white" @click.stop="scroll(-1)" ></span>
                     </td>
                     <td>
-                <img class="vh-row-4 float-center img-fluid" v-bind:src="props.imageRoot + props.images[context.index]"/>
+                <!-- <img class="vh-row-4 float-center img-fluid" v-bind:src="props.imageRoot + props.images[context.index]"/> -->
+                <img class="vh-row-4 float-center img-fluid" :src="props.imageRoot + props.images[context.index]"/>
                     </td>
                     <td>
                 <span class="bi bi-arrow-right-circle p-2 fs-1 text-white" @click.stop="scroll(1)"></span>
@@ -59,5 +60,8 @@ function scroll(step: number) {
                 </tr>
             </tbody>
         </table>
+        <div class="text-white">
+            {{ props.imageRoot + props.images[context.index] }}
+        </div>
     </div>
 </template>
