@@ -139,7 +139,7 @@ function reset() {
                     <template v-if="context.show === 'calendar'">
                         <div class="full-screen">
                             <div class="grid-container">
-                                <template v-for="(data) in daraArr">
+                                <template v-for="(data) in dataArr">
                                     <div> {{ data }} </div>
                                 </template>
                             </div>
