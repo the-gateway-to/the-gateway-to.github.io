@@ -4,10 +4,12 @@ import { ref } from 'vue';
 
 export interface IContext {
     index: number;
+    // imageUrl: string;
 }
 
 const context = ref<IContext>({
     index: 0,
+    // imageUrl: '',
 });
 
 const props = defineProps({
@@ -37,11 +39,15 @@ function scroll(step: number) {
     }
 }
 
-function buildUrl(imageUrl: string) {
-    const host = [location.hostname, location.port].filter((h) => h).join(':');
-    const url = `http://${host}/${props.imageRoot + imageUrl}`;
-    debug('buildUrl', { imageUrl, url });
-    return url;
+// function buildUrl(imageUrl: string) {
+//     const host = [location.hostname, location.port].filter((h) => h).join(':');
+//     const url = `http://${host}/${props.imageRoot + imageUrl}`;
+//     debug('buildUrl', { imageUrl, url });
+//     return url;
+// }
+
+function getImageUrl(imageUrl: string) {
+    return new URL(`${props.imageRoot + props.images[context.value.index]}`, import.meta.url).href
 }
 
 function debug(message: string, detail: any) {
@@ -49,6 +55,7 @@ function debug(message: string, detail: any) {
         alert(JSON.stringify({ message, detail }, null, 2));
     }
 }
+
 
 debug('carousel', { props, context });
 
@@ -64,7 +71,9 @@ debug('carousel', { props, context });
                     </td>
                     <td>
                 <!-- <img class="vh-row-4 float-center img-fluid" v-bind:src="props.imageRoot + props.images[context.index]"/> -->
-                <img class="vh-row-4 float-center img-fluid" :src="buildUrl(props.images[context.index])"/>
+                <!-- <img class="vh-row-4 float-center img-fluid" :src="buildUrl(props.images[context.index])"/> -->
+                <img class="vh-row-4 float-center img-fluid" :src="getImageUrl(props.images[context.index])"/>
+                <!-- <img class="vh-row-4 float-center img-fluid" :src="props.imageRoot + props.images[context.index]"/> -->
                     </td>
                     <td>
                 <span class="bi bi-arrow-right-circle p-2 fs-1 text-white" @click.stop="scroll(1)"></span>
