@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 export interface IContext {
     index: number;
@@ -47,10 +47,11 @@ function scroll(step: number) {
 // }
 
 function getImageUrl(imageUrl: string) {
-    // const img = new URL(`${props.imageRoot + imageUrl}`, import.meta.url).href;
-    const img = `${props.imageRoot + imageUrl}`;
+    const imgPath = `${props.imageRoot + imageUrl}`;
+    const img = computed(() => new URL(imgPath, import.meta.url).href);
     
-    debug('getImageUrl', { imageUrl, img });
+    
+    debug('getImageUrl', { imgPath });
     return img;
 }
 
