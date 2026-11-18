@@ -47,12 +47,12 @@ function scroll(step: number) {
 // }
 
 function getImageUrl(imageUrl: string) {
-    const imgPath = `${props.imageRoot + imageUrl}`;
-    const img = computed(() => new URL(imgPath, import.meta.url).href);
+    const imgPath = `${import.meta.env.BASE_URL + props.imageRoot + imageUrl}`;
+    // const img = computed(() => new URL(imgPath, import.meta.url).href);
     
     
     debug('getImageUrl', { imgPath });
-    return img;
+    return imgPath;
 }
 
 function debug(message: string, detail: any) {

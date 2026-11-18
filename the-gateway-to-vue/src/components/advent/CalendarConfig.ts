@@ -17,7 +17,7 @@ export const config: ICalendarConfig = {
   background: [
     '../../assets/images/background.png'
   ],
-  imageRoot: '/pdf/lego-40809/',
+  imageRoot: 'pdf/lego-40809/',
   day: {
     1: {
       passcode: 'seasons-greetings',
