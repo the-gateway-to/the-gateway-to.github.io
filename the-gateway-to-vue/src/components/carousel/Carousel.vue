@@ -19,7 +19,11 @@ const props = defineProps({
         type: Array as PropType<string[]>,
         required: true,
         default: [],
-    }
+    },
+    debug: {
+        type: String,
+        default: 'false',
+    },
 });
 
 function scroll(step: number) {
@@ -31,6 +35,10 @@ function scroll(step: number) {
     } else {
         context.value.index = resolved;
     }
+}
+
+if (`${props.debug}`.toLocaleLowerCase() === 'true') {
+    alert(JSON.stringify({ msg: 'carousel', props, context }, null, 2));
 }
 
 </script>

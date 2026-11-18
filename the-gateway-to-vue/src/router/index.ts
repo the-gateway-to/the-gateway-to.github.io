@@ -7,7 +7,10 @@ const routes = [
     path: "/christmas",
     name: "AdventCalendar",
     component: AdventCalendar,
-    props: (route: any) => ({ date: route.params.date || null }),
+    props: (route: any) => ({ 
+      date: route.params.date || null, 
+      debug: route.query.debug === 'true' 
+    }),
   },
   {
     path: "/test001",
