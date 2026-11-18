@@ -212,13 +212,13 @@ function reset() {
       align-items: center;
       overflow: hidden;
     }
-    .full-screen {
-      min-width: 100vw;
-      max-width: 100vw;
-      min-height: 100vh;
-      max-height: 100vh;
-      border: 1px solid green;
-    }
+.full-screen {
+  min-width: 100vw;
+  max-width: 100vw;
+  min-height: 100vh;
+  max-height: 100vh;
+  border: 1px solid green;
+}
 
 body {
     background-image: url(../../assets/images/background.png);
