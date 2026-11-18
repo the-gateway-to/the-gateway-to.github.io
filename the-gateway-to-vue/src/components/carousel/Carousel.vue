@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
 export interface IContext {
     index: number;
