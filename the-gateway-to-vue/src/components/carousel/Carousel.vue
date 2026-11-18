@@ -47,7 +47,9 @@ function scroll(step: number) {
 // }
 
 function getImageUrl(imageUrl: string) {
-    return new URL(`${props.imageRoot + imageUrl}`, import.meta.url).href
+    const img = new URL(`${props.imageRoot + imageUrl}`, import.meta.url).href;
+    debug('getImageUrl', { imageUrl, img });
+    return img;
 }
 
 function debug(message: string, detail: any) {
