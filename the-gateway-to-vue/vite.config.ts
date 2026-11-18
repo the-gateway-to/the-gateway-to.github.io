@@ -9,7 +9,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  publicDir: 'public_assets',
+  publicDir: 'public',
   plugins: [vue()],
   // plugins: [vue(), ViteMinifyPlugin(), viteSingleFile()],
 })
