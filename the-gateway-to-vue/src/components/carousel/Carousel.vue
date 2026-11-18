@@ -37,9 +37,19 @@ function scroll(step: number) {
     }
 }
 
-if (`${props.debug}`.toLocaleLowerCase() === 'true') {
-    alert(JSON.stringify({ msg: 'carousel', props, context }, null, 2));
+function buildUrl(imageUrl: string) {
+    const url = `http://${location.hostname}:${location.port}/${props.imageRoot + imageUrl}`;
+    debug('buildUrl', { imageUrl, url });
+    return url;
 }
+
+function debug(message: string, detail: any) {
+    if (`${props.debug}`.toLocaleLowerCase() === 'true') {
+        alert(JSON.stringify({ message, detail }, null, 2));
+    }
+}
+
+debug('carousel', { props, context });
 
 </script>
 
@@ -53,7 +63,7 @@ if (`${props.debug}`.toLocaleLowerCase() === 'true') {
                     </td>
                     <td>
                 <!-- <img class="vh-row-4 float-center img-fluid" v-bind:src="props.imageRoot + props.images[context.index]"/> -->
-                <img class="vh-row-4 float-center img-fluid" :src="props.imageRoot + props.images[context.index]"/>
+                <img class="vh-row-4 float-center img-fluid" :src="buildUrl(props.images[context.index])"/>
                     </td>
                     <td>
                 <span class="bi bi-arrow-right-circle p-2 fs-1 text-white" @click.stop="scroll(1)"></span>
