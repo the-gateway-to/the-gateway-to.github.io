@@ -131,7 +131,7 @@ function reset() {
                             <div class="container-fluid">
                         <div class="row align-middle">
                             <div class="col">
-                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="route.query.debug"></Carousel>
+                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel>
                             </div>
                         </div>
                         </div>
