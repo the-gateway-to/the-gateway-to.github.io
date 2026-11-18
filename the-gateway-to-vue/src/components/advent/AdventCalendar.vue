@@ -8,6 +8,10 @@ import Carousel from '../carousel/Carousel.vue';
 import Modal from '../modal/Modal.vue';
 import { ModalContext } from '../modal/modal-context.ts';
 
+const route = useRoute();
+
+console.log({ query: route.query });
+
 export interface Context {
     show: 'calendar' | 'password' | 'detail' | 'unavailable';
     currentDay: number,
@@ -20,9 +24,7 @@ export interface Props {
     date?: string;
 }
 
-const route = useRoute();
 const routeDate = Utils.getFirst(route.query.date);
-
 
 const unlocked = useStorage('unlocked', 0);
 
@@ -129,7 +131,7 @@ function reset() {
                             <div class="container-fluid">
                         <div class="row align-middle">
                             <div class="col">
-                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images"></Carousel>
+                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="route.query.debug"></Carousel>
                             </div>
                         </div>
                         </div>
