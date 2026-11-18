@@ -38,7 +38,8 @@ function scroll(step: number) {
 }
 
 function buildUrl(imageUrl: string) {
-    const url = `http://${location.hostname}:${location.port}/${props.imageRoot + imageUrl}`;
+    const host = [location.hostname, location.port].filter((h) => h).join(':');
+    const url = `http://${host}/${props.imageRoot + imageUrl}`;
     debug('buildUrl', { imageUrl, url });
     return url;
 }
