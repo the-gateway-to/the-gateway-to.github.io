@@ -47,7 +47,7 @@ function scroll(step: number) {
 // }
 
 function getImageUrl(imageUrl: string) {
-    return new URL(`${props.imageRoot + props.images[context.value.index]}`, import.meta.url).href
+    return new URL(`${props.imageRoot + imageUrl}`, import.meta.url).href
 }
 
 function debug(message: string, detail: any) {
