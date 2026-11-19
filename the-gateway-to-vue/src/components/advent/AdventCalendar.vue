@@ -139,19 +139,20 @@ function reset() {
                         <div class="container-fluid">
                             <div class="row align-middle">
                                 <div class="col">
+                                    <div @click.stop">
+                                        <Carousel v-bind="carouselConfig">
+                                            <Slide v-for="slide in config.day[context.selectedDay || 0].images"
+                                                :key="slide">
+                                                <img :src="config.imageRoot + context.selectedDay + '/' + slide"
+                                                    class="img-fluid" />
+                                            </Slide>
 
-                                    <Carousel v-bind="carouselConfig">
-                                        <Slide v-for="slide in config.day[context.selectedDay || 0].images"
-                                            :key="slide">
-                                            <img :src="config.imageRoot + context.selectedDay + '/' + slide"
-                                                class="img-fluid" />
-                                        </Slide>
-
-                                        <template #addons>
-                                            <Navigation @click.stop="" />
-                                            <Pagination @click.stop="" />
-                                        </template>
-                                    </Carousel>
+                                            <template #addons>
+                                                <Navigation />
+                                                <Pagination />
+                                            </template>
+                                        </Carousel>
+                                    </div>
 
                                     <!-- <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel> -->
                                 </div>
