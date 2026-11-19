@@ -12,6 +12,8 @@ import { ModalContext } from '../modal/modal-context.ts';
 
 const route = useRoute();
 
+console.log({ route, config });
+
 if (route.query.debug === 'true') {
     alert(JSON.stringify({route, config}, null, 2));
 }
