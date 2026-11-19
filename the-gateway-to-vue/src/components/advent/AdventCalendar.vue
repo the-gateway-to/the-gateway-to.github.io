@@ -4,7 +4,9 @@ import { useRoute } from 'vue-router';
 import { config } from './CalendarConfig';
 import { Utils } from '../../common/utils'
 import { useStorage } from '@vueuse/core';
-import Carousel from '../carousel/Carousel.vue';
+// import Carousel from '../carousel/Carousel.vue';
+import 'vue3-carousel/dist/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import Modal from '../modal/Modal.vue';
 import { ModalContext } from '../modal/modal-context.ts';
 
@@ -34,6 +36,11 @@ const context = ref<Context>({
     message: '',
 });
 
+const carouselConfig = {
+    itemsToShow: 1,
+    wrapAround: true
+}
+
 const dateArr = Utils.getRandomNumberArray(49, 6);
 
 function handleDayClick(day: number, msg: string = '') {
@@ -58,7 +65,7 @@ function handleDayClick(day: number, msg: string = '') {
 function handlePasswordEntry(day?: number, pwd?: string) {
     console.log({ day, pwd });
     if (day != null && config.day[day].passcode.toLocaleLowerCase() === `${pwd}`.toLocaleLowerCase()) {
-        console.log({ configPwd: config.day[day].passcode});
+        console.log({ configPwd: config.day[day].passcode });
         unlocked.value = day;
         handleDayClick(day);
     } else {
@@ -89,7 +96,7 @@ function reset() {
                     <Modal id="modal-passcode">
                         <div class="row">
                             <div class="col">
-                                <img class="img-fluid" src="../../assets/images/elf-thinking.png"/>
+                                <img class="img-fluid" src="../../assets/images/elf-thinking.png" />
                             </div>
                         </div>
                         <div class="col">
@@ -102,10 +109,12 @@ function reset() {
                                 <div class="row">
                                     <div class="col">
                                         <div class="input-group mb-3">
-                                            <input type="text" class="form-control" placeholder="PASSCODE" v-model="context.enteredPasscode" @click.stop="">
-                                            <button class="btn btn-outline-success" type="button" @click="handlePasswordEntry(context.selectedDay, context.enteredPasscode)">Submit</button>
+                                            <input type="text" class="form-control" placeholder="PASSCODE"
+                                                v-model="context.enteredPasscode" @click.stop="">
+                                            <button class="btn btn-outline-success" type="button"
+                                                @click="handlePasswordEntry(context.selectedDay, context.enteredPasscode)">Submit</button>
                                         </div>
-                                   </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -114,7 +123,7 @@ function reset() {
                     <Modal id="modal-early">
                         <div class="row">
                             <div class="col">
-                                <img class="img-fluid" src="../../assets/images/elf-grumpy.png"/>
+                                <img class="img-fluid" src="../../assets/images/elf-grumpy.png" />
                             </div>
                         </div>
                         <div class="row">
@@ -125,15 +134,28 @@ function reset() {
                             </div>
                         </div>
                     </Modal>
-                    
-                    <Modal id="modal-detail" :size="'extra-large'"
-                        <!-- <div class="vh-row-7 align-middle"> -->
-                            <div class="container-fluid">
-                        <div class="row align-middle">
-                            <div class="col">
-                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel>
+
+                    <Modal id="modal-detail" :size="'extra-large'" <!-- <div class="vh-row-7 align-middle"> -->
+                        <div class="container-fluid">
+                            <div class="row align-middle">
+                                <div class="col">
+
+                                    <Carousel v-bind="carouselConfig">
+                                        <Slide v-for="slide in config.day[context.selectedDay || 0].images"
+                                            :key="slide">
+                                            <img :src="config.imageRoot + context.selectedDay + '/' + slide"
+                                                class="img-fluid" />
+                                        </Slide>
+
+                                        <template #addons>
+                                            <Navigation @click.stop="" />
+                                            <Pagination @click.stop="" />
+                                        </template>
+                                    </Carousel>
+
+                                    <!-- <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel> -->
+                                </div>
                             </div>
-                        </div>
                         </div>
                         <!-- </div> -->
                     </Modal>
@@ -145,12 +167,10 @@ function reset() {
                                     <tr style="height: 1px;">
                                         <template v-for="(col) in row">
                                             <td class="align-middle text-center p-1 px-3" style="height: inherit;">
-                                                <div @click="handleDayClick(col)" 
-                                                        type="button" 
-                                                        v-if="col <= 24" 
-                                                        style="height: 100%;" 
-                                                        class="font-cute-snow align-items-center text-center window"> 
-                                                        <!-- border border-dark rounded-start-2 -->
+                                                <div @click="handleDayClick(col)" type="button" v-if="col <= 24"
+                                                    style="height: 100%;"
+                                                    class="font-cute-snow align-items-center text-center window">
+                                                    <!-- border border-dark rounded-start-2 -->
                                                     <h5>{{ col }}</h5>
                                                 </div>
                                             </td>
@@ -171,7 +191,6 @@ function reset() {
 </template>
 
 <style lang="css">
-
 body {
     background-image: url(../../assets/images/background.png);
     color: beige;
@@ -215,18 +234,18 @@ body {
 }
 
 @font-face {
-  font-family: 'Snowballs';
-  src: url(../../assets/fonts/Snowballs.ttf) format('woff2');
+    font-family: 'Snowballs';
+    src: url(../../assets/fonts/Snowballs.ttf) format('woff2');
 }
 
 @font-face {
-  font-family: 'CuteSnow-SnowFlake';
-  src: url(../../assets/fonts/CuteSnow-SnowFlake.ttf) format('truetype');
+    font-family: 'CuteSnow-SnowFlake';
+    src: url(../../assets/fonts/CuteSnow-SnowFlake.ttf) format('truetype');
 }
 
 @font-face {
-  font-family: 'ChristmasEve';
-  src: url(../../assets/fonts/christmaseve.ttf) format('truetype');
+    font-family: 'ChristmasEve';
+    src: url(../../assets/fonts/christmaseve.ttf) format('truetype');
 }
 
 @font-face {
@@ -240,15 +259,15 @@ body {
 }
 
 .font-snowballs {
-  font-family: 'Snowballs', sans-serif;
+    font-family: 'Snowballs', sans-serif;
 }
 
 .font-cute-snow {
-  font-family: 'CuteSnow-SnowFlake', sans-serif;
+    font-family: 'CuteSnow-SnowFlake', sans-serif;
 }
 
 .font-christmas-eve {
-  font-family: 'ChristmasEve', sans-serif;
+    font-family: 'ChristmasEve', sans-serif;
 }
 
 .font-christmas-icons {
