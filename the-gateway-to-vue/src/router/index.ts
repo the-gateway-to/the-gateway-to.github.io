@@ -1,7 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 import NotFound from '../components/NotFound.vue';
 import AdventCalendar from "../components/advent/AdventCalendar.vue";
-import AdventCalendar2 from "../components/advent/AdventCalendar2.vue";
+import AdventCalendarTest from "../components/advent/AdventCalendarTest.vue";
 
 const routes = [
   {
@@ -15,8 +15,12 @@ const routes = [
   },
   {
     path: "/test",
-    name: "AdventCalendar2",
-    component: AdventCalendar2,
+    name: "AdventCalendarTest",
+    component: AdventCalendarTest,
+    props: (route: any) => ({
+      date: route.params.date || null, 
+      debug: route.query.debug === 'true' 
+    }),
   },
   {
     path: "/:catchAll(.*)",

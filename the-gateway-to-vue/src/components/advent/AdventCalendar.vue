@@ -13,7 +13,7 @@ import { ModalContext } from '../modal/modal-context.ts';
 const route = useRoute();
 
 console.log({ route, config });
-
+alert(JSON.stringify({route, config}, null, 2));
 if (route.query.debug === 'true') {
     alert(JSON.stringify({route, config}, null, 2));
 }
@@ -141,11 +141,11 @@ function reset() {
                         </div>
                     </Modal>
 
-                    <Modal id="modal-detail" :size="'extra-large'" <!-- <div class="vh-row-7 align-middle"> -->
+                    <Modal id="modal-detail" :size="'extra-large'" class="vh-row-7 align-middle">
                         <div class="container-fluid">
                             <div class="row align-middle">
                                 <div class="col">
-                                    <div @click.stop">
+                                    <div @click.stop="">
                                         <Carousel v-bind="carouselConfig">
                                             <Slide v-for="slide in config.day[context.selectedDay || 0].images"
                                                 :key="slide">
