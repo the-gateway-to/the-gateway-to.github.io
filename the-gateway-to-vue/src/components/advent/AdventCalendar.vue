@@ -141,11 +141,11 @@ function reset() {
                         </div>
                     </Modal>
 
-                    <Modal id="modal-detail" :size="'extra-large'" <!-- <div class="vh-row-7 align-middle"> -->
+                    <Modal id="modal-detail" :size="'extra-large'" class="vh-row-7 align-middle">
                         <div class="container-fluid">
                             <div class="row align-middle">
                                 <div class="col">
-                                    <div @click.stop">
+                                    <div @click.stop="">
                                         <Carousel v-bind="carouselConfig">
                                             <Slide v-for="slide in config.day[context.selectedDay || 0].images"
                                                 :key="slide">
