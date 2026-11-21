@@ -35,6 +35,10 @@ export class Utils {
         }, []);
     }
 
+    static randomArray(lrngth: number): number[] {
+        return [...Array(lrngth).keys()].slice(1).sort(() => Math.random() - 0.5);
+    }
+    
     static getFirst(val: any): any {
         if (val) {
             return (val instanceof Array) ? val[0] : val;

@@ -23,6 +23,8 @@ export interface Props {
 const route = useRoute();
 const routeDate = Utils.getFirst(route.query.date);
 
+alert(JSON.stringify({config}, null, 2));
+
 
 const unlocked = useStorage('unlocked', 0);
 
@@ -32,7 +34,12 @@ const context = ref<Context>({
     message: '',
 });
 
-const dateArr = Utils.getRandomNumberArray(49, 100);
+const dateArr = Utils.randomArray(41);
+
+const carouselConfig = {
+    itemsToShow: 1,
+    wrapAround: true
+}
 
 function handleDayClick(day: number, msg: string = '') {
     console.log({ day, msg });
@@ -56,7 +63,7 @@ function handleDayClick(day: number, msg: string = '') {
 function handlePasswordEntry(day?: number, pwd?: string) {
     console.log({ day, pwd });
     if (day != null && config.day[day].passcode.toLocaleLowerCase() === `${pwd}`.toLocaleLowerCase()) {
-        console.log({ configPwd: config.day[day].passcode});
+        console.log({ configPwd: config.day[day].passcode });
         unlocked.value = day;
         handleDayClick(day);
     } else {
@@ -73,21 +80,34 @@ function reset() {
 </script>
 
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid p-2vw">
+        <template v-if="context.show === 'calendar'">
+            <!-- <div class="full-screen"> -->
+            <div class="grid-container">
+                <div class="font-cute-snow text-center title-container fs-1">
+                    {{ config.title }} {{ routeDate }} {{ context.selectedDay }}
+                </div>
+                <template v-for="(data) in dateArr">
+                    <div>
+                        <div v-if="data <= 24" class="window" @click.stop="handleDayClick(data)">
+                            <span class="font-cute-snow fs-5">{{ data }}</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div>
+                <span class="font-christmas-icons float-end" @click="reset()">A</span>
+            </div>
+        </template>
         <div class="row">
             <div class="col-1"></div>
             <div class="col-10">
-
-                <h1 class="vh-row-1 font-cute-snow text-center">
-                    {{ config.title }} {{ routeDate }}
-                </h1>
                 <div class="vh-row-6" style="height: 100%;">
-
 
                     <Modal id="modal-passcode">
                         <div class="row">
                             <div class="col">
-                                <img class="img-fluid" src="../../assets/images/elf-thinking.png"/>
+                                <img class="img-fluid" src="../../assets/images/elf-thinking.png" />
                             </div>
                         </div>
                         <div class="col">
@@ -100,10 +120,12 @@ function reset() {
                                 <div class="row">
                                     <div class="col">
                                         <div class="input-group mb-3">
-                                            <input type="text" class="form-control" placeholder="PASSCODE" v-model="context.enteredPasscode" @click.stop="">
-                                            <button class="btn btn-outline-success" type="button" @click="handlePasswordEntry(context.selectedDay, context.enteredPasscode)">Submit</button>
+                                            <input type="text" class="form-control" placeholder="PASSCODE"
+                                                v-model="context.enteredPasscode" @click.stop="">
+                                            <button class="btn btn-outline-success" type="button"
+                                                @click="handlePasswordEntry(context.selectedDay, context.enteredPasscode)">Submit</button>
                                         </div>
-                                   </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +134,7 @@ function reset() {
                     <Modal id="modal-early">
                         <div class="row">
                             <div class="col">
-                                <img class="img-fluid" src="../../assets/images/elf-grumpy.png"/>
+                                <img class="img-fluid" src="../../assets/images/elf-grumpy.png" />
                             </div>
                         </div>
                         <div class="row">
@@ -123,53 +145,41 @@ function reset() {
                             </div>
                         </div>
                     </Modal>
-                    
-                    <Modal id="modal-detail" :size="'extra-large'"
-                        <!-- <div class="vh-row-7 align-middle"> -->
-                            <div class="container-fluid">
-                        <div class="row align-middle">
-                            <div class="col">
-                                <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images"></Carousel>
+
+                    <Modal id="modal-detail" :size="'extra-large'" class="vh-row-7 align-middle">
+                        <div class="container-fluid">
+                            <div class="row align-middle">
+                                <div class="col">
+                                    <div @click.stop="">
+                                        <div class="text-white">
+                                        {{  config.day[context.selectedDay || 0].images }}
+                                        
+                                        </div>
+                                        <Carousel v-bind="carouselConfig">
+                                            <Slide v-for="slide in config.day[context.selectedDay || 0].images"
+                                                :key="slide">
+                                                <img :src="config.imageRoot + context.selectedDay + '/' + slide"
+                                                    class="img-fluid" />
+                                            </Slide>
+
+                                            <template #addons>
+                                                <Navigation />
+                                                <Pagination />
+                                            </template>
+                                        </Carousel>
+                                    </div>
+
+                                    <!-- <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel> -->
+                                </div>
                             </div>
-                        </div>
                         </div>
                         <!-- </div> -->
                     </Modal>
 
-                    <template v-if="context.show === 'calendar'">
-                        <div class="full-screen">
-                            <div class="grid-container">
-                                <template v-for="(data) in dateArr">
-                                    <div> {{ data }} </div>
-                                </template>
-                            </div>
-                        </div>
-                    
-                        <!--
-                        <table class="vh-row-6" width="100%">
-                            <tbody>
-                                <template v-for="(row) in dateArr">
-                                    <tr style="height: 1px;">
-                                        <template v-for="(col) in row">
-                                            <td class="align-middle text-center p-1 px-3" style="height: inherit;">
-                                                <div @click="handleDayClick(col)" 
-                                                        type="button" 
-                                                        v-if="col <= 24" 
-                                                        style="height: 100%;" 
-                                                        class="font-cute-snow align-items-center text-center window"> 
-                                                    <h5>{{ col }}</h5>
-                                                </div>
-                                            </td>
-                                        </template>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                        -->
-                        <div>
-                            <span class="font-christmas-icons float-end" @click="reset()">A</span>
-                        </div>
-                    </template>
+
+
+
+
                 </div>
 
             </div>
@@ -178,47 +188,66 @@ function reset() {
 </template>
 
 <style lang="css">
+:root {
+    --dim: 12vmin;
+    --dim-inner: 10vmin;
+}
 
-    :root {
-      --dim: 10vmin;
-    }
-    .window {
-      border: 1px solid red;
-      min-width: var(--dim);
-      max-width: vat(--dim);
-      min-height: var(--dim);
-      max-height: var(--dim);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
+.window-deprecated {
+    border: 1px solid red;
+    min-width: var(--dim);
+    max-width: var(--dim);
+    min-height: var(--dim);
+    max-height: var(--dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
 
-    .grid-container {
-      display: grid;
-      grid-template-columns: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin;
-      grid-template-rows: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin;
-      background-color: #2196f3;
-    }
+.grid-container {
+    /* border: 1px solid green; */
+    display: grid !important;
+    /* grid-template-columns: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin; */
+    grid-template-columns: 12vw 12vw 12vw 12vw 12vw 12vw 12vw 12vw;
+    /* grid-template-rows: 12.6vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh; */
+    grid-template-rows: 16vh 16vh 16vh 16vh 16vh 16vh;
+    /* background-color: #2196f3; */
+    justify-content: center;
+    align-items: center;
+}
 
-    .grid-container > div {
-      border: 1px solid red;
-      min-width: var(--dim);
-      max-width: var(--dim);
-      min-height: var(--dim);
-      max-height: var(--dim);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-    .full-screen {
-      min-width: 100vw;
-      max-width: 100vw;
-      min-height: 100vh;
-      max-height: 100vh;
-      border: 1px solid green;
-    }
+.grid-container>div {
+    /* border: 1px solid red; */
+    min-width: var(--dim);
+    max-width: var(--dim);
+    min-height: var(--dim);
+    max-height: var(--dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+.title-container {
+    /* border: 1px solid red; */
+    grid-column: 1 / span 8;
+    min-width: 96vw !important;
+    max-width: 96vw !important;
+}
+
+.full-screen {
+    min-width: 100vw;
+    max-width: 100vw;
+    min-height: 100vh;
+    max-height: 100vh;
+    /* border: 1px solid green; */
+}
+
+p-2vw {
+    padding: 2vw !important;
+}
 
 body {
     background-image: url(../../assets/images/background.png);
@@ -230,6 +259,10 @@ body {
 }
 
 .window {
+    min-width: var(--dim-inner);
+    max-width: var(--dim-inner);
+    min-height: var(--dim-inner);
+    max-height: var(--dim-inner);
     color: beige;
     border-color: darkgrey !important;
     border-top-style: solid !important;
@@ -237,8 +270,8 @@ body {
     border-left-style: solid !important;
     border-right-style: dashed !important;
     border-width: 1px !important;
-    border-top-left-radius: 8px !important;
-    border-bottom-left-radius: 8px !important;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
     background-color: rgb(0, 0, 0, 0.03) !important;
     text-align: center !important;
     display: flex !important;
@@ -263,18 +296,18 @@ body {
 }
 
 @font-face {
-  font-family: 'Snowballs';
-  src: url(../../assets/fonts/Snowballs.ttf) format('woff2');
+    font-family: 'Snowballs';
+    src: url(../../assets/fonts/Snowballs.ttf) format('woff2');
 }
 
 @font-face {
-  font-family: 'CuteSnow-SnowFlake';
-  src: url(../../assets/fonts/CuteSnow-SnowFlake.ttf) format('truetype');
+    font-family: 'CuteSnow-SnowFlake';
+    src: url(../../assets/fonts/CuteSnow-SnowFlake.ttf) format('truetype');
 }
 
 @font-face {
-  font-family: 'ChristmasEve';
-  src: url(../../assets/fonts/christmaseve.ttf) format('truetype');
+    font-family: 'ChristmasEve';
+    src: url(../../assets/fonts/christmaseve.ttf) format('truetype');
 }
 
 @font-face {
@@ -288,15 +321,15 @@ body {
 }
 
 .font-snowballs {
-  font-family: 'Snowballs', sans-serif;
+    font-family: 'Snowballs', sans-serif;
 }
 
 .font-cute-snow {
-  font-family: 'CuteSnow-SnowFlake', sans-serif;
+    font-family: 'CuteSnow-SnowFlake', sans-serif;
 }
 
 .font-christmas-eve {
-  font-family: 'ChristmasEve', sans-serif;
+    font-family: 'ChristmasEve', sans-serif;
 }
 
 .font-christmas-icons {

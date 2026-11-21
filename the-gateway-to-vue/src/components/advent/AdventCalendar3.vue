@@ -1,0 +1,344 @@
+<script lang="ts" setup>
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { config } from './CalendarConfig.ts';
+import { Utils } from '../../common/utils.ts'
+import { useStorage } from '@vueuse/core';
+// import Carousel from '../carousel/Carousel.vue';
+import 'vue3-carousel/dist/carousel.css'
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import Modal from '../modal/Modal.vue';
+import { ModalContext } from '../modal/modal-context.ts';
+
+const route = useRoute();
+
+if (route.query.debug === 'true') {
+    alert(JSON.stringify({ route, config }, null, 2));
+}
+
+// console.log({ query: route.query });
+
+export interface Context {
+    show: 'calendar' | 'password' | 'detail' | 'unavailable';
+    currentDay: number,
+    message: string,
+    selectedDay?: number,
+    enteredPasscode?: string,
+}
+
+export interface Props {
+    date?: string;
+}
+
+const routeDate = Utils.getFirst(route.query.date);
+
+const unlocked = useStorage('unlocked', 0);
+
+const context = ref<Context>({
+    show: 'calendar',
+    currentDay: Utils.daysDifference(Utils.toDateOrDefault(config.startDate, routeDate)),
+    message: '',
+});
+
+const carouselConfig = {
+    itemsToShow: 1,
+    wrapAround: true
+}
+
+const dateArr = Utils.randomArray(41);
+
+function handleDayClick(day: number, msg: string = '') {
+    console.log({ day, msg });
+    context.value.message = msg;
+    context.value.selectedDay = day;
+    ModalContext.clear();
+
+    if (day > 0 && (day < context.value.currentDay || day <= unlocked.value)) {
+        // context.value.show = 'detail';
+        ModalContext.toggle('modal-detail')
+    } else if (day === context.value.currentDay) {
+        ModalContext.toggle('modal-passcode')
+        // context.value.show = 'password';
+    } else {
+        ModalContext.toggle('modal-early');
+        // ModalContext.clear();
+        // context.value.show = 'unavailable';
+    }
+}
+
+function handlePasswordEntry(day?: number, pwd?: string) {
+    console.log({ day, pwd });
+    if (day != null && config.day[day].passcode.toLocaleLowerCase() === `${pwd}`.toLocaleLowerCase()) {
+        console.log({ configPwd: config.day[day].passcode });
+        unlocked.value = day;
+        handleDayClick(day);
+    } else {
+        context.value.enteredPasscode = undefined;
+        handleDayClick(-1, `Oi dummy, that's not the right passcode for the ${Utils.humanReadableDay(day)}`)
+    }
+}
+
+function reset() {
+    unlocked.value = undefined;
+    context.value.enteredPasscode = undefined;
+}
+
+</script>
+
+<template>
+
+    <template v-if="context.show === 'calendar'">
+
+        <div class="grid-container">
+            <div class="font-cute-snow text-center title-container fs-1">
+                {{ config.title }} {{ routeDate }}
+            </div>
+            <template v-for="(data) in dateArr">
+                <div>
+                    <div v-if="data <= 24" class="window" @click.stop="handleDayClick(data)">
+                        <span class="font-cute-snow fs-5">{{ data }}</span>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <div>
+            <span class="font-christmas-icons float-end" @click="reset()">A</span>
+        </div>
+    </template>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10">
+
+                <div class="vh-row-6" style="height: 100%;">
+                    <Modal id="modal-passcode">
+                        <div class="row">
+                            <div class="col">
+                                <img class="img-fluid" src="../../assets/images/elf-thinking.png" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="font-cute-snow text-white text-center fs-2 p-2 opacity-darker rounded-2">
+                                <div class="row">
+                                    <div class="col">
+                                        I think you need to enter a passcode
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" placeholder="PASSCODE"
+                                                v-model="context.enteredPasscode" @click.stop="">
+                                            <button class="btn btn-outline-success" type="button"
+                                                @click="handlePasswordEntry(context.selectedDay, context.enteredPasscode)">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+
+                    <Modal id="modal-early">
+                        <div class="row">
+                            <div class="col">
+                                <img class="img-fluid" src="../../assets/images/elf-grumpy.png" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="font-cute-snow text-white text-center fs-2 p-2 opacity-darker rounded-2">
+                                    I think you tried to open a window a bit too early!
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+
+                    <Modal id="modal-detail" :size="'extra-large'" class="vh-row-7 align-middle">
+                        <div class="container-fluid">
+                            <div class="row align-middle">
+                                <div class="col">
+                                    <div @click.stop="">
+                                        <Carousel v-bind="carouselConfig">
+                                            <Slide v-for="slide in config.day[context.selectedDay || 0].images"
+                                                :key="slide">
+                                                <img :src="config.imageRoot + context.selectedDay + '/' + slide"
+                                                    class="img-fluid" />
+                                            </Slide>
+
+                                            <template #addons>
+                                                <Navigation />
+                                                <Pagination />
+                                            </template>
+                                        </Carousel>
+                                    </div>
+
+                                    <!-- <Carousel :image-root="config.imageRoot + context.selectedDay + '/'" :images="config.day[context.selectedDay || 0].images" :debug="`${route.query.debug}`"></Carousel> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                    </Modal>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="css">
+:root {
+    --dim: 12vmin;
+    --dim-inner: 10vmin;
+}
+
+.window-deprecated {
+    border: 1px solid red;
+    min-width: var(--dim);
+    max-width: var(--dim);
+    min-height: var(--dim);
+    max-height: var(--dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.grid-container {
+    /* border: 1px solid green; */
+    display: grid !important;
+    /* grid-template-columns: 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin 12.5vmin; */
+    grid-template-columns: 12vw 12vw 12vw 12vw 12vw 12vw 12vw 12vw;
+    /* grid-template-rows: 12.6vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh 12.5vh; */
+    grid-template-rows: 16vh 16vh 16vh 16vh 16vh 16vh;
+    /* background-color: #2196f3; */
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-container>div {
+    /* border: 1px solid red; */
+    min-width: var(--dim);
+    max-width: var(--dim);
+    min-height: var(--dim);
+    max-height: var(--dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+.title-container {
+    /* border: 1px solid red; */
+    grid-column: 1 / span 8;
+    min-width: 96vw !important;
+    max-width: 96vw !important;
+}
+
+.full-screen {
+    min-width: 100vw;
+    max-width: 100vw;
+    min-height: 100vh;
+    max-height: 100vh;
+    /* border: 1px solid green; */
+}
+
+p-2vw {
+    padding: 2vw !important;
+}
+
+body {
+    background-image: url(../../assets/images/background.png);
+    color: beige;
+    min-height: 100%;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.window {
+    min-width: var(--dim-inner);
+    max-width: var(--dim-inner);
+    min-height: var(--dim-inner);
+    max-height: var(--dim-inner);
+    color: beige;
+    border-color: darkgrey !important;
+    border-top-style: solid !important;
+    border-bottom-style: solid !important;
+    border-left-style: solid !important;
+    border-right-style: dashed !important;
+    border-width: 1px !important;
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+    background-color: rgb(0, 0, 0, 0.03) !important;
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.window:hover {
+    background-color: rgb(0, 0, 0, 0.1) !important;
+}
+
+.opacity-dark {
+    background-color: rgb(0, 0, 0, 0.4) !important;
+}
+
+.opacity-darker {
+    background-color: rgb(0, 0, 0, 0.6) !important;
+}
+
+.border-none {
+    border: 0 !important;
+}
+
+@font-face {
+    font-family: 'Snowballs';
+    src: url(../../assets/fonts/Snowballs.ttf) format('woff2');
+}
+
+@font-face {
+    font-family: 'CuteSnow-SnowFlake';
+    src: url(../../assets/fonts/CuteSnow-SnowFlake.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'ChristmasEve';
+    src: url(../../assets/fonts/christmaseve.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'LastChristmasSymbols';
+    src: url(../../assets/fonts/LastChristmasSymbols_PERSONAL_USE_ONLY.otf);
+}
+
+@font-face {
+    font-family: 'Christmas and Santona';
+    src: url(../../assets/fonts/Christmas\ and\ Santona.ttf);
+}
+
+.font-snowballs {
+    font-family: 'Snowballs', sans-serif;
+}
+
+.font-cute-snow {
+    font-family: 'CuteSnow-SnowFlake', sans-serif;
+}
+
+.font-christmas-eve {
+    font-family: 'ChristmasEve', sans-serif;
+}
+
+.font-christmas-icons {
+    font-family: 'LastChristmasSymbols', sans-serif;
+}
+
+.font-christmas-bold {
+    font-family: 'Christmas and Santona', sans-serif;
+}
+</style>
